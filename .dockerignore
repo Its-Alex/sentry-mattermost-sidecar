@@ -1,0 +1,9 @@
+.vscode/
+Makefile
+README.md
+LICENSE
+
+bin/
+
+Dockerfile
+docker-compose.yml
