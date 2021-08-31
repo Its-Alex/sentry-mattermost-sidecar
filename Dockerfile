@@ -5,7 +5,6 @@ WORKDIR /src
 COPY go.mod /src/
 COPY go.sum /src/
 COPY cmd/ /src/cmd/
-COPY internal/ /src/internal/
 
 RUN go mod download \
     && GOOS=linux GOARCH=amd64 go build -v -o bin/sms github.com/itsalex/sentry-mattermost-sidecar/cmd/sms
