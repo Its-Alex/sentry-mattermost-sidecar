@@ -8,11 +8,17 @@ services:
       - ./:/code/
     command: sleep infinity
 
+  requests-catcher:
+    image: smarterdm/http-request-catcher
+    restart: unless-stopped
+    ports:
+      - 5000:5000
+
   sentry-mattermost-sidecar:
     image: itsalex/alpine-reflex:latest
     restart: unless-stopped
     environment:
-      - SMS_MATTERMOST_WEBHOOK_URL=localhost:1230
+      - SMS_MATTERMOST_WEBHOOK_URL=http://requests-catcher:5000
     volumes:
       - ./:/code/
     ports:

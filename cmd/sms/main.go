@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/itsalex/sentry-mattermost-sidecar/internal"
 	"github.com/spf13/viper"
+	"github.com/tidwall/gjson"
 )
 
 func init() {
@@ -32,32 +33,32 @@ func main() {
 
 	r.POST("/:channel", func(c *gin.Context) {
 		channel := c.Param("channel")
-		body := internal.Webhook{}
 
-		err := c.ShouldBindJSON(&body)
+		jsonByteData, err := ioutil.ReadAll(c.Request.Body)
 		if err != nil {
-			log.Fatalf("An Error Occured during bind json: %v", err)
+			log.Fatalf("Error reading body: %v", err)
 		}
+		jsonStringData := string(jsonByteData)
 
 		postBody, err := json.Marshal(map[string]interface{}{
 			"channel": channel,
 			"attachments": []interface{}{
 				map[string]interface{}{
-					"title":       body.Event.Title,
+					"title":       gjson.Get(jsonStringData, "event.title").String(),
 					"color":       "#FF0000",
 					"author_name": "Sentry",
 					"author_icon": "https://assets.stickpng.com/images/58482eedcef1014c0b5e4a76.png",
-					"title_link":  body.URL,
+					"title_link":  gjson.Get(jsonStringData, "url").String(),
 					"fields": []interface{}{
 						map[string]interface{}{
 							"short": false,
 							"title": "Culprit",
-							"value": body.Culprit,
+							"value": gjson.Get(jsonStringData, "culprit").String(),
 						},
 						map[string]interface{}{
 							"short": false,
 							"title": "Project",
-							"value": body.ProjectSlug,
+							"value": gjson.Get(jsonStringData, "project_slug").String(),
 						},
 					},
 				},
