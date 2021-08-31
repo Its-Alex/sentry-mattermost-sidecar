@@ -29,7 +29,9 @@ func init() {
 }
 
 func main() {
-	r := gin.Default()
+	r := gin.New()
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery())
 
 	r.POST("/:channel", func(c *gin.Context) {
 		channel := c.Param("channel")

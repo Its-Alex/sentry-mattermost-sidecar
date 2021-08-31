@@ -13,6 +13,7 @@ FROM alpine:3.14.2
 
 COPY --from=builder /src/bin/sms /usr/bin/go-sms
 
+ENV GIN_MODE=release
 ENV SMS_PORT=1323
 
 EXPOSE 1323
