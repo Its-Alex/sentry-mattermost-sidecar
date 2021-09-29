@@ -62,6 +62,11 @@ func main() {
 							"title": "Project",
 							"value": gjson.Get(jsonStringData, "project_slug").String(),
 						},
+						map[string]interface{}{
+							"short": false,
+							"title": "Environment",
+							"value": gjson.Get(jsonStringData, "event.environment").String(),
+						},
 					},
 				},
 			},
