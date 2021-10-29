@@ -7,7 +7,8 @@ curl --location --request POST 'localhost:1323/admin-console' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "event": {
-        "title": "customTitle"
+        "title": "customTitle",
+        "environment": "production"
     },
     "url": "customUrl",
     "culprit": "customCulprit",
