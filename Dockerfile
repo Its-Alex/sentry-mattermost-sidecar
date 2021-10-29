@@ -7,7 +7,7 @@ COPY go.sum /src/
 COPY cmd/ /src/cmd/
 
 RUN go mod download \
-    && GOOS=linux GOARCH=amd64 go build -v -o bin/sms github.com/itsalex/sentry-mattermost-sidecar/cmd/sms
+    && GOOS=linux go build -v -o bin/sms github.com/itsalex/sentry-mattermost-sidecar/cmd/sms
 
 FROM alpine:3.14.2
 
