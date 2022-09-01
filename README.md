@@ -50,6 +50,8 @@ docker run -d \
 	-p 1323:1323 \
 	--restart=always \
 	-e SMS_MATTERMOST_WEBHOOK_URL="https://..." \
+	-e SMS_HOST="127.0.0.1" \
+	-e SMS_PORT="1323" \
 	rpsl/sentry-mattermost-sidecar:latest
 ```
 
