@@ -50,7 +50,7 @@ docker run -d \
 	-p 1323:1323 \
 	--restart=always \
 	-e SMS_MATTERMOST_WEBHOOK_URL="https://..." \
-	rpsl/sentry-mattermost-sidecar
+	rpsl/sentry-mattermost-sidecar:latest
 ```
 
 To deploy a new tag use [`./scripts/create-and-push-tag.sh`](scripts/create-and-push-tag.sh):

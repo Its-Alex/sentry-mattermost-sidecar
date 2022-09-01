@@ -1,9 +1,9 @@
 .vscode/
+.git/
+.idea/
+docs/
+build/
 Makefile
 README.md
 LICENSE
-
-bin/
-
 Dockerfile
-docker-compose.yml
