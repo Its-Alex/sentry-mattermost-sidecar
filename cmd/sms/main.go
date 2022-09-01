@@ -16,9 +16,9 @@ import (
 func init() {
 	viper.SetEnvPrefix("sms")
 
-	viper.BindEnv("mattermost_webhook_url")
-	viper.BindEnv("host")
-	viper.BindEnv("port")
+	_ = viper.BindEnv("mattermost_webhook_url")
+	_ = viper.BindEnv("host")
+	_ = viper.BindEnv("port")
 
 	viper.SetDefault("addr", "0.0.0.0")
 	viper.SetDefault("port", "1323")
@@ -84,10 +84,12 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error when performing webhook call: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() {
+			_ = resp.Body.Close()
+		}()
 	})
 
-	r.Run(fmt.Sprintf(
+	_ = r.Run(fmt.Sprintf(
 		"%s:%s",
 		viper.GetString("host"),
 		viper.GetString("port"),

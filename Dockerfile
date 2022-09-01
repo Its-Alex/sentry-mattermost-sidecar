@@ -10,12 +10,12 @@ COPY . .
 RUN go mod download
 RUN go mod verify
 
-RUN export CGO_ENABLED=0 && go build -o /sentry-mattermost-sidecar ./main.go
+RUN export CGO_ENABLED=0 && go build -o /sentry-mattermost-sidecar ./cmd/sms/main.go
 
 ##
 ## Production
 ##
-FROM golang:1.18-alpine
+FROM golang:1.19-alpine
 
 WORKDIR /app/
 
