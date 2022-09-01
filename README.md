@@ -9,10 +9,13 @@ This tools is a sidecar to use sentry webhook on mattermost.
 
 ## How to use
 
-First you must create a [Mattermost incoming webhook](https://docs.mattermost.com/developer/webhooks-incoming.html) integration.
+First you must create a [Mattermost incoming webhook](https://docs.mattermost.com/developer/webhooks-incoming.html)
+integration.
 ![mattermost-incoming-webhook-integration-setup](docs/assets/mattermost-incoming-webhook-integration-setup.png)
 
-Next you must deploy the [docker image](https://hub.docker.com/r/itsalex/sentry-mattermost-sidecar) (don't forget to fill `SMS_MATTERMOST_WEBHOOK_URL` environment variable with the Mattermost webhook URL) somewhere and redirect sentry webhook on it with route name defined as Mattermost channel for each projects.
+Next you must deploy the [docker image](https://hub.docker.com/r/rpsl/sentry-mattermost-sidecar) (don't forget to
+fill `SMS_MATTERMOST_WEBHOOK_URL` environment variable with the Mattermost webhook URL) somewhere and redirect sentry
+webhook on it with route name defined as Mattermost channel for each projects.
 ![sentry-webhook-integration-setup](docs/assets/sentry-webhook-integration-setup.png)
 
 Then you setup [sentry issue alerts](https://docs.sentry.io/product/alerts/) as you like.
@@ -20,32 +23,14 @@ Then you setup [sentry issue alerts](https://docs.sentry.io/product/alerts/) as 
 
 ## Getting started
 
-### Requirement
-
-- `docker`
-- `go`
-- `bash`
-
-## Hack
-
-To start you must launch dev environment:
+You can build local binary or docker image with:
 
 ```sh
-$ ./scripts/up.sh
+$ make build-bin
 ```
 
-This will launch images in [`docker-compose.yml`](./docker-compose.yml).
-
-An image named `workspace` with golang is used as a isolated container to develop. You can use [`enter-workspace.sh`](./scripts/enter-workspace.sh) to enter inside it:
-
 ```sh
-$ ./scripts/enter-workspace.sh
-```
-
-You can build with:
-
-```sh
-$ ./scripts/build.sh
+$ make build-docker
 ```
 
 You can test an example sentry webhook with:
@@ -54,15 +39,19 @@ You can test an example sentry webhook with:
 $ ./scripts/test-request.sh
 ```
 
-Then you can see the converted request that will be send to mattermost using:
-
-```sh
-$ ./scripts/get-last-request-result.sh
-```
-
 ## Deploy
 
-This image is automatically deployed and versionned as a docker image at [itsalex/sentry-mattermost-sidecar](https://hub.docker.com/r/itsalex/sentry-mattermost-sidecar).
+This image is automatically deployed and versioned as a docker image
+at [rpsl/sentry-mattermost-sidecar](https://hub.docker.com/r/rpsl/sentry-mattermost-sidecar).
+
+```shell
+docker run -d \
+	--name sentry-mattermost-sidecar \
+	-p 1323:1323 \
+	--restart=always \
+	-e SMS_MATTERMOST_WEBHOOK_URL="https://..." \
+	rpsl/sentry-mattermost-sidecar
+```
 
 To deploy a new tag use [`./scripts/create-and-push-tag.sh`](scripts/create-and-push-tag.sh):
 

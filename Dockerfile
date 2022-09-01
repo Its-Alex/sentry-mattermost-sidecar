@@ -1,21 +1,24 @@
-FROM golang:1.17.0-alpine3.14 as builder
+##
+## Build
+##
+FROM golang:1.19-buster AS build
 
-WORKDIR /src
+WORKDIR /app
 
-COPY go.mod /src/
-COPY go.sum /src/
-COPY cmd/ /src/cmd/
+COPY . .
 
-RUN go mod download \
-    && GOOS=linux go build -v -o bin/sms github.com/itsalex/sentry-mattermost-sidecar/cmd/sms
+RUN go mod download
+RUN go mod verify
 
-FROM alpine:3.14.2
+RUN export CGO_ENABLED=0 && go build -o /sentry-mattermost-sidecar ./main.go
 
-COPY --from=builder /src/bin/sms /usr/bin/go-sms
+##
+## Production
+##
+FROM golang:1.18-alpine
 
-ENV GIN_MODE=release
-ENV SMS_PORT=1323
+WORKDIR /app/
 
-EXPOSE 1323
+COPY --from=build /sentry-mattermost-sidecar /app/sentry-mattermost-sidecar
 
-CMD ["/usr/bin/go-sms"]
+ENTRYPOINT ["/app/sentry-mattermost-sidecar"]

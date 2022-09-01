@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout project
         uses: actions/checkout@v2
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
       - name: Build and push
@@ -20,35 +18,33 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           platforms: linux/amd64,linux/arm64
-          tags: itsalex/sentry-mattermost-sidecar:test-build-ci
+          tags: rpsl/sentry-mattermost-sidecar:test-build-ci
           file: Dockerfile
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
   pre-release:
     name: "Pre Release"
-    if: ${{ github.repository == 'Its-Alex/sentry-mattermost-sidecar' && contains(github.ref, 'refs/heads/main') }}
+    if: ${{ github.repository == 'Rpsl/sentry-mattermost-sidecar' && contains(github.ref, 'refs/heads/main') }}
     runs-on: "ubuntu-latest"
     steps:
       - name: Checkout project
         uses: actions/checkout@v2
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.ITSALEX_DOCKER_REGISTRY_USERNAME }}
-          password: ${{ secrets.ITSALEX_DOCKER_REGISTRY_PASSWORD }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
         with:
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: itsalex/sentry-mattermost-sidecar:latest
+          tags: rpsl/sentry-mattermost-sidecar:latest
           file: Dockerfile
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
@@ -62,7 +58,7 @@ jobs:
 
   tagged-release:
     name: "Tagged Release"
-    if: ${{ github.repository == 'Its-Alex/sentry-mattermost-sidecar' && contains(github.ref, 'refs/tags/v') }}
+    if: ${{ github.repository == 'Rpsl/sentry-mattermost-sidecar' && contains(github.ref, 'refs/tags/v') }}
     runs-on: "ubuntu-latest"
     steps:
       - name: Checkout project
@@ -72,22 +68,20 @@ jobs:
         id: branch_name
         run: echo ::set-output name=TAG_VERSION::${GITHUB_REF#refs/tags/v}
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.ITSALEX_DOCKER_REGISTRY_USERNAME }}
-          password: ${{ secrets.ITSALEX_DOCKER_REGISTRY_PASSWORD }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
         with:
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: itsalex/sentry-mattermost-sidecar:${{ steps.branch_name.outputs.TAG_VERSION }}
+          tags: rpsl/sentry-mattermost-sidecar:${{ steps.branch_name.outputs.TAG_VERSION }}
           file: Dockerfile
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
