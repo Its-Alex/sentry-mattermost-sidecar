@@ -13,6 +13,13 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+var SentryFields = map[string]string{
+	"Culprit":     "culprit",
+	"Project":     "project_slug",
+	"Environment": "event.environment",
+	"Server":      "event.server_name",
+}
+
 func init() {
 	viper.SetEnvPrefix("sms")
 
@@ -42,7 +49,23 @@ func main() {
 		}
 		jsonStringData := string(jsonByteData)
 
-		postBody, err := json.Marshal(map[string]interface{}{
+		var fields []interface{}
+
+		for k, v := range SentryFields {
+			sVal := gjson.Get(jsonStringData, v).String()
+
+			if sVal == "" {
+				continue
+			}
+
+			fields = append(fields, map[string]interface{}{
+				"short": false,
+				"title": k,
+				"value": sVal,
+			})
+		}
+
+		payload := map[string]interface{}{
 			"channel": channel,
 			"attachments": []interface{}{
 				map[string]interface{}{
@@ -51,26 +74,12 @@ func main() {
 					"author_name": "Sentry",
 					"author_icon": "https://assets.stickpng.com/images/58482eedcef1014c0b5e4a76.png",
 					"title_link":  gjson.Get(jsonStringData, "url").String(),
-					"fields": []interface{}{
-						map[string]interface{}{
-							"short": false,
-							"title": "Culprit",
-							"value": gjson.Get(jsonStringData, "culprit").String(),
-						},
-						map[string]interface{}{
-							"short": false,
-							"title": "Project",
-							"value": gjson.Get(jsonStringData, "project_slug").String(),
-						},
-						map[string]interface{}{
-							"short": false,
-							"title": "Environment",
-							"value": gjson.Get(jsonStringData, "event.environment").String(),
-						},
-					},
+					"fields":      fields,
 				},
 			},
-		})
+		}
+
+		mmPayload, err := json.Marshal(payload)
 
 		if err != nil {
 			log.Fatalf("Error during json marshal: %v", err)
@@ -79,8 +88,9 @@ func main() {
 		resp, err := http.Post(
 			viper.GetString("mattermost_webhook_url"),
 			"application/json",
-			bytes.NewBuffer(postBody),
+			bytes.NewBuffer(mmPayload),
 		)
+
 		if err != nil {
 			log.Fatalf("Error when performing webhook call: %v", err)
 		}
