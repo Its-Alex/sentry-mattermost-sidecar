@@ -41,6 +41,8 @@ func readEnvironment(config *Config) (*Config, error) {
 	}
 
 	if os.Getenv("SMS_DEBUG") != "true" {
+		config.Debug = false
+	} else {
 		config.Debug = true
 	}
 

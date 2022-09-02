@@ -4,7 +4,9 @@ go 1.19
 
 require (
 	github.com/gin-gonic/gin v1.7.4
+	github.com/sirupsen/logrus v1.9.0
 	github.com/tidwall/gjson v1.10.2
+	github.com/toorop/gin-logrus v0.0.0-20210225092905-2c785434f26f
 )
 
 require (
@@ -23,7 +25,7 @@ require (
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/ugorji/go/codec v1.2.6 // indirect
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
-	golang.org/x/sys v0.0.0-20210823070655-63515b42dcdf // indirect
+	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 	golang.org/x/text v0.3.6 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
