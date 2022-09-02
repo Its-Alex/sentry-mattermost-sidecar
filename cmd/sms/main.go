@@ -9,7 +9,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
+	"github.com/rpsl/sentry-mattermost-sidecar/config"
 	"github.com/tidwall/gjson"
 )
 
@@ -20,22 +20,16 @@ var SentryFields = map[string]string{
 	"Server":      "event.server_name",
 }
 
-func init() {
-	viper.SetEnvPrefix("sms")
-
-	_ = viper.BindEnv("mattermost_webhook_url")
-	_ = viper.BindEnv("host")
-	_ = viper.BindEnv("port")
-
-	viper.SetDefault("addr", "0.0.0.0")
-	viper.SetDefault("port", "1323")
-
-	if viper.GetString("mattermost_webhook_url") == "" {
-		log.Fatalf("SMS_MATTERMOST_WEBHOOK_URL environment variable must be set!")
-	}
-}
-
 func main() {
+	cfg, err := config.LoadConfig()
+
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+
+	// todo: print motd screen on start
+	// log.Println(cfg.WebhookURL)
+
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
@@ -86,7 +80,7 @@ func main() {
 		}
 
 		resp, err := http.Post(
-			viper.GetString("mattermost_webhook_url"),
+			cfg.WebhookURL,
 			"application/json",
 			bytes.NewBuffer(mmPayload),
 		)
@@ -101,7 +95,7 @@ func main() {
 
 	_ = r.Run(fmt.Sprintf(
 		"%s:%s",
-		viper.GetString("host"),
-		viper.GetString("port"),
+		cfg.ListenHost,
+		cfg.ListenPort,
 	))
 }
