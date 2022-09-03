@@ -6,7 +6,10 @@ import (
 )
 
 func SetRoutes(r *gin.Engine) {
-	r.POST("/:channel", controllers.WebHookHandler)
+	// temporary for compatibility
+	r.POST("/:channel", controllers.SentryWebHookHandler)
 
 	// todo add NoRoute handler
+	// need to use named handlers for potential new features
+	r.POST("/sentry/:channel", controllers.SentryWebHookHandler)
 }

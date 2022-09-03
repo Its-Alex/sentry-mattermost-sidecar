@@ -36,7 +36,6 @@ func main() {
 
 	r := gin.New()
 	r.Use(ginlogrus.Logger(log.New()), gin.Recovery())
-	r.Use(gin.Recovery())
 	r.Use(mCfg.AttachConfig(cfg))
 
 	routers.SetRoutes(r)

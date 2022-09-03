@@ -36,7 +36,7 @@ $ make build-docker
 You can test an example sentry webhook with:
 
 ```sh
-$ ./scripts/test-request.sh
+$ make test
 ```
 
 ## Deploy
