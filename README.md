@@ -23,7 +23,6 @@ Then you setup [sentry issue alerts](https://docs.sentry.io/product/alerts/) as 
 ### Requirement
 
 - `docker`
-- `go`
 - `bash`
 
 ## Hack
@@ -36,13 +35,15 @@ $ ./scripts/up.sh
 
 This will launch images in [`docker-compose.yml`](./docker-compose.yml).
 
-An image named `workspace` with golang is used as a isolated container to develop. You can use [`enter-workspace.sh`](./scripts/enter-workspace.sh) to enter inside it:
+An image named `workspace` with golang is used as a isolated container to
+develop. You can use [`enter-workspace.sh`](./scripts/enter-workspace.sh)
+to enter inside it:
 
 ```sh
 $ ./scripts/enter-workspace.sh
 ```
 
-You can build with:
+From outside the container you can build with:
 
 ```sh
 $ ./scripts/build.sh
