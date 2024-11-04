@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -36,7 +36,7 @@ func main() {
 	r.POST("/:channel", func(c *gin.Context) {
 		channel := c.Param("channel")
 
-		jsonByteData, err := ioutil.ReadAll(c.Request.Body)
+		jsonByteData, err := io.ReadAll(c.Request.Body)
 		if err != nil {
 			log.Fatalf("Error reading body: %v", err)
 		}
