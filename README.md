@@ -24,6 +24,8 @@ Then you setup [sentry issue alerts](https://docs.sentry.io/product/alerts/) as 
 
 - `docker`
 - `bash`
+- `virtualbox` (if you want to setup local mattermost and sentry instance)
+- `vagrant` (if you want to setup local mattermost and sentry instance)
 
 ## Hack
 
@@ -69,4 +71,58 @@ To deploy a new tag use [`./scripts/create-and-push-tag.sh`](scripts/create-and-
 
 ```sh
 $ ./scripts/create-and-push-tag.sh 1.0.0
+```
+
+## Setup VM with Mattermost and Sentry
+
+You can setup a VM with Mattermost and Sentry if you want to perform real tests.
+You should have at least:
+
+- `16` CPU thread
+- `20GB` RAM
+
+If you valid those requiremnts, you can launch the VM:
+
+```sh
+$ vagrant up
+```
+
+A server will be launch with Mattermost and Sentry installed, you should now
+create Sentry first user:
+
+```sh
+$ vagrant ssh -c "cd /opt/sentry && sudo docker compose run web upgrade"
+...
+Running hooks in /etc/ca-certificates/update.d...
+done.
+Running migrations for default
+Operations to perform:
+  Apply all migrations: auth, contenttypes, feedback, hybridcloud, nodestore, replays, sentry, sessions, sites, social_auth
+Running migrations:
+  No migrations to apply.
+Creating missing DSNs
+Correcting Group.num_comments counter
+17:26:28 [INFO] sentry.outboxes: Executing outbox replication backfill
+17:26:28 [INFO] sentry.outboxes: Processing sentry.ControlOutboxs...
+17:26:28 [INFO] sentry.outboxes: Processing sentry.RegionOutboxs...
+17:26:28 [INFO] sentry.outboxes: done
+
+Would you like to create a user account now? [Y/n]:
+
+```
+
+Follow the instruction to create Sentry default user. Mattermost default user
+will be asked on the first connection on Mattermost url.
+
+You're now ready, you can new access services with the following URLs:
+
+- Sentry: http://192.168.56.4:9000/
+- Mattermost: http://192.168.56.4:8065/
+
+The VM have a static IP so you can always access it with IP `192.168.56.4`.
+You can find the IP of your computer accessible from the VM using:
+
+```sh
+$ ip a | grep 192.168.56 | awk '{print $2}'
+192.168.56.1/24
 ```
