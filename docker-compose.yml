@@ -18,6 +18,7 @@ services:
     restart: unless-stopped
     environment:
       - SMS_MATTERMOST_WEBHOOK_URL=http://requests-catcher:5000
+      # - SMS_MATTERMOST_WEBHOOK_URL=http://192.168.56.4:8065/hooks/abckus71ojr9idqarirt4mr8wa # To use with mattermost replace with mattermost webhook URL 
     volumes:
       - ./:/code/
     ports:

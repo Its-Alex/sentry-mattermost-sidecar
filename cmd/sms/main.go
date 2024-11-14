@@ -42,6 +42,14 @@ func main() {
 		}
 		jsonStringData := string(jsonByteData)
 
+		var prettyJSON bytes.Buffer
+		error := json.Indent(&prettyJSON, []byte(jsonStringData), "", "\t")
+		if error != nil {
+			log.Println("JSON parse error: ", error)
+			return
+		}
+		fmt.Println(prettyJSON.String())
+
 		var postBody []byte
 		if c.Request.Header.Get("Sentry-Hook-Resource") == "error" && gjson.Get(jsonStringData, "action").String() == "created" {
 			title := gjson.Get(jsonStringData, "data.error.title").String()
