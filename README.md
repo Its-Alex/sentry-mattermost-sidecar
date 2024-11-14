@@ -37,10 +37,23 @@ Then you setup [sentry issue alerts](https://docs.sentry.io/product/alerts/) as 
 
 ### Requirement
 
+- [`mise`](https://mise.jdx.dev/) (if you want to send real errors to sentry)
 - `docker`
 - `bash`
 - `virtualbox` (if you want to setup local mattermost and sentry instance)
 - `vagrant` (if you want to setup local mattermost and sentry instance)
+
+If you want to send real errors to sentry, and you have installed
+[`mise`](https://mise.jdx.dev/), you must execute the following commands to
+have everything working:
+
+```sh
+$ mise trust && mise install
+$ pip install -r requirements.txt
+```
+
+This will install python with a predefined version of sentry-sdk python package
+in an isolated [.venv](https://docs.python.org/3/library/venv.html) folder.
 
 ## Hack
 
@@ -78,6 +91,10 @@ Then you can see the converted request that will be send to mattermost using:
 $ ./scripts/get-last-request-result.sh
 ```
 
+This is an environment aimed to reproduced real use case. If you really want to
+perform tests with Mattermost and Sentry, you can do it locally following
+[Setup VM with Mattermost and Sentry](#setup-vm-with-mattermost-and-sentry).
+
 ## Deploy
 
 This image is automatically deployed and versionned as a docker image at [itsalex/sentry-mattermost-sidecar](https://hub.docker.com/r/itsalex/sentry-mattermost-sidecar).
@@ -89,6 +106,8 @@ $ ./scripts/create-and-push-tag.sh 1.0.0
 ```
 
 ## Setup VM with Mattermost and Sentry
+
+### Setup
 
 You can setup a VM with Mattermost and Sentry if you want to perform real tests.
 You should have at least:
@@ -129,15 +148,69 @@ Would you like to create a user account now? [Y/n]:
 Follow the instruction to create Sentry default user. Mattermost default user
 will be asked on the first connection on Mattermost url.
 
+Please create a Mattermost user by going at http://192.168.56.4:8065/ and follow
+instructions.
+
 You're now ready, you can new access services with the following URLs:
 
 - Sentry: http://192.168.56.4:9000/
 - Mattermost: http://192.168.56.4:8065/
 
 The VM have a static IP so you can always access it with IP `192.168.56.4`.
-You can find the IP of your computer accessible from the VM using:
+You can find the IP of your computer accessible (most likely `192.168.56.1`)
+from the VM using:
 
 ```sh
 $ ip a | grep 192.168.56 | awk '{print $2}'
 192.168.56.1/24
 ```
+
+You can now [configure webhooks](#configure-webhooks)
+
+### Configure webhooks
+
+This step is planned to be automatised, but for now we must do it manually. It
+aim to create [Mattermost incoming webhook](https://developers.mattermost.com/integrate/webhooks/incoming/)
+and [Sentry Webhook](https://docs.sentry.io/organization/integrations/integration-platform/webhooks/).
+
+You can configure
+[Mattermost incoming webhook](https://developers.mattermost.com/integrate/webhooks/incoming/)
+on any channel you want. To use it in development, replace
+[the content of the variable in the following line `SMS_MATTERMOST_WEBHOOK_URL=http://requests-catcher:5000`](/docker-compose.yml#L20)
+by your mattermost webhook.
+
+Restart (or start) the container by using:
+
+```sh
+$ docker compose up -d
+```
+
+Finally you must configure [Sentry Webhook](https://docs.sentry.io/organization/integrations/integration-platform/webhooks/).
+The URL of the webhook should be `http://<your-ip>:1323/<channel-name>`, for
+example, if your IP is `192.168.56.1` and the channel where you want to
+publish is `test` your URL will be: `http://192.168.56.1:1323/test`.
+
+You can test if everything is working by following
+[Send errors to Sentry](#send-errors-to-sentry) or using your way.
+
+## Send errors to Sentry
+
+The repository contains a python script that can be used to push errors to sentry.
+Make sure you've followed [the requirements](#requirement) before continue.
+
+You should update the Sentry DSN in
+[scripts/sentry-trigger-error.py](/scripts/sentry-trigger-error.py#L4) by
+the DSN of your project.
+
+You can now trigger an error by using:
+
+```sh
+$ python scripts/sentry-trigger-error.py
+Traceback (most recent call last):
+  File "/home/alex/Documents/sentry-mattermost-sidecar/scripts/sentry-trigger-error.py", line 10, in <module>
+    division_by_zero = 1 / 0
+                       ~~^~~
+ZeroDivisionError: division by zero
+```
+
+An error should be generated on Sentry.
