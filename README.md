@@ -4,8 +4,8 @@ This tools is a sidecar to use sentry webhook on mattermost.
 
 ## Roadmap
 
-- [x] Handle sentry Issue alerts
-- [ ] Handle sentry Metric alerts
+- [x] Handle sentry Issue alerts with [webhook legacy integration](https://github.com/getsentry/sentry-webhooks)
+- [ ] Handle sentry Metric alerts with [webhook legacy integration](https://github.com/getsentry/sentry-webhooks)
 
 ## How to use
 
