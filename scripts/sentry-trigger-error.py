@@ -7,4 +7,6 @@ sentry_sdk.init(
     traces_sample_rate=1.0,
 )
 
-division_by_zero = 1 / 0
+
+
+division_by_z = 1 / 0

@@ -42,14 +42,6 @@ func main() {
 		}
 		jsonStringData := string(jsonByteData)
 
-		var prettyJSON bytes.Buffer
-		error := json.Indent(&prettyJSON, []byte(jsonStringData), "", "\t")
-		if error != nil {
-			log.Println("JSON parse error: ", error)
-			return
-		}
-		fmt.Println(prettyJSON.String())
-
 		var postBody []byte
 		if c.Request.Header.Get("Sentry-Hook-Resource") == "error" && gjson.Get(jsonStringData, "action").String() == "created" {
 			title := gjson.Get(jsonStringData, "data.error.title").String()
@@ -61,7 +53,7 @@ func main() {
 						"title":       title,
 						"fallback":    title,
 						"color":       "#FF0000",
-						"author_name": "Sentry - Errors",
+						"author_name": "Sentry - Issues",
 						"author_icon": "https://assets.stickpng.com/images/58482eedcef1014c0b5e4a76.png",
 						"title_link":  gjson.Get(jsonStringData, "data.error.web_url").String(),
 						"fields": []interface{}{
@@ -91,6 +83,56 @@ func main() {
 			})
 			if err != nil {
 				log.Fatalf("Error during json marshal: %v", err)
+			}
+		} else if c.Request.Header.Get("Sentry-Hook-Resource") == "issue" {
+			var prettyJSON bytes.Buffer
+			error := json.Indent(&prettyJSON, []byte(jsonStringData), "", "\t")
+			if error != nil {
+				log.Println("JSON parse error: ", error)
+				return
+			}
+			fmt.Println(prettyJSON.String())
+			title := gjson.Get(jsonStringData, "data.issue.title").String()
+			if gjson.Get(jsonStringData, "action").String() == "created" {
+
+				postBody, err = json.Marshal(map[string]interface{}{
+					"channel": channel,
+					"attachments": []interface{}{
+						map[string]interface{}{
+							"title":       title,
+							"fallback":    title,
+							"color":       "#FF0000",
+							"author_name": "Sentry - Comments",
+							"author_icon": "https://assets.stickpng.com/images/58482eedcef1014c0b5e4a76.png",
+							"title_link":  gjson.Get(jsonStringData, "data.issue.web_url").String(),
+							"fields": []interface{}{
+								map[string]interface{}{
+									"short": false,
+									"title": "Type",
+									"value": gjson.Get(jsonStringData, "action").String(),
+								},
+								map[string]interface{}{
+									"short": false,
+									"title": "Culprit",
+									"value": gjson.Get(jsonStringData, "data.issue.culprit").String(),
+								},
+								map[string]interface{}{
+									"short": false,
+									"title": "Project ID",
+									"value": gjson.Get(jsonStringData, "data.issue.project").String(),
+								},
+								map[string]interface{}{
+									"short": false,
+									"title": "Environment",
+									"value": gjson.Get(jsonStringData, "data.issue.environment").String(),
+								},
+							},
+						},
+					},
+				})
+				if err != nil {
+					log.Fatalf("Error during json marshal: %v", err)
+				}
 			}
 		} else {
 			// Legacy integration
