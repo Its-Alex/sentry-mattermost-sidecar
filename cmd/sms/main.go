@@ -42,15 +42,10 @@ func main() {
 		}
 		jsonStringData := string(jsonByteData)
 
-		var prettyJSON bytes.Buffer
-		error := json.Indent(&prettyJSON, []byte(jsonStringData), "", "\t")
-		if error != nil {
-			log.Println("JSON parse error: ", error)
-			return
-		}
-
 		var postBody []byte
 		if c.Request.Header.Get("Sentry-Hook-Resource") == "error" && gjson.Get(jsonStringData, "action").String() == "created" {
+			log.Println("Use error custom integration")
+
 			title := gjson.Get(jsonStringData, "data.error.title").String()
 
 			postBody, err = json.Marshal(map[string]interface{}{
@@ -92,14 +87,10 @@ func main() {
 				log.Fatalf("Error during json marshal: %v", err)
 			}
 		} else if c.Request.Header.Get("Sentry-Hook-Resource") == "issue" {
-			var prettyJSON bytes.Buffer
-			error := json.Indent(&prettyJSON, []byte(jsonStringData), "", "\t")
-			if error != nil {
-				log.Println("JSON parse error: ", error)
-				return
-			}
-			fmt.Println(prettyJSON.String())
+			log.Println("Use issue custom integration")
+
 			title := gjson.Get(jsonStringData, "data.issue.title").String()
+
 			if gjson.Get(jsonStringData, "action").String() == "created" {
 
 				postBody, err = json.Marshal(map[string]interface{}{
@@ -149,6 +140,8 @@ func main() {
 			}
 		} else {
 			// Legacy integration
+			log.Println("Use legacy integration")
+
 			title := gjson.Get(jsonStringData, "event.title").String()
 
 			postBody, err = json.Marshal(map[string]interface{}{
