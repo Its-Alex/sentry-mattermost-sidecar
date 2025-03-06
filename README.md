@@ -10,11 +10,11 @@ This tools is a sidecar to use sentry webhook on mattermost.
   - Issues alerts
     - [ ] `triggered` action
   - Issues
-    - [ ] `created` action
-    - [ ] `resolved` action
-    - [ ] `assigned` action
-    - [ ] `archived` action
-    - [ ] `unresolved` action
+    - [x] `created` action
+    - [x] `resolved` action
+    - [x] `assigned` action
+    - [x] `archived` action
+    - [x] `unresolved` action
   - Comments
     - [ ] `created` action
     - [ ] `updated` action
