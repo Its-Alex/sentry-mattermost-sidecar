@@ -20,7 +20,7 @@ This tools is a sidecar to use sentry webhook on mattermost.
     - [ ] `updated` action
     - [ ] `deleted` action
   - Errors 
-    - [*] `triggered` action
+    - [x] `created` action
 
 ## How to use
 
