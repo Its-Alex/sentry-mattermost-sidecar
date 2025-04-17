@@ -24,14 +24,14 @@ This tools is a sidecar to use sentry webhook on mattermost.
 
 ## How to use
 
-First you must create a [Mattermost incoming webhook](https://docs.mattermost.com/developer/webhooks-incoming.html) integration.
+First you must create a [Mattermost incoming webhook](https://developers.mattermost.com/integrate/webhooks/incoming/)
+integration:  
 ![mattermost-incoming-webhook-integration-setup](docs/assets/mattermost-incoming-webhook-integration-setup.png)
 
 Next you must deploy the [docker image](https://hub.docker.com/r/itsalex/sentry-mattermost-sidecar) (don't forget to fill `SMS_MATTERMOST_WEBHOOK_URL` environment variable with the Mattermost webhook URL) somewhere and redirect sentry webhook on it with route name defined as Mattermost channel for each projects.
-![sentry-webhook-integration-setup](docs/assets/sentry-webhook-integration-setup.png)
 
-Then you setup [sentry issue alerts](https://docs.sentry.io/product/alerts/) as you like.
-![sentry-issue-alert-creation](docs/assets/sentry-issue-alert-creation.png)
+Finally you must setup sentry custom integration and alert:  
+![sentry-webhook-integration-setup](docs/assets/sentry-integration-and-alert-creation.gif)
 
 ## Getting started
 
