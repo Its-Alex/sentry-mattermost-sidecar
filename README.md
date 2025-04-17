@@ -17,9 +17,9 @@ This tools is a sidecar to use sentry webhook on mattermost.
 ## Roadmap
 
 - [x] Handle sentry Issue alerts with [webhook legacy integration](https://github.com/getsentry/sentry-webhooks)
-  (must be setup with legacy webhook integration)
+  must be setup with legacy webhook integration
 - [ ] Handle sentry Metric alerts with [webhook legacy integration](https://github.com/getsentry/sentry-webhooks)
-  (must be setup with legacy webhook integration)
+  must be setup with legacy webhook integration (PR are welcome)
 - Handle [Custom integration - Sentry webhook](https://docs.sentry.io/organization/integrations/integration-platform/webhooks/)
   - Issues alerts
     - [x] `triggered` action
@@ -29,7 +29,7 @@ This tools is a sidecar to use sentry webhook on mattermost.
     - [x] `assigned` action
     - [x] `archived` action
     - [x] `unresolved` action
-  - Comments
+  - Comments (PR are welcome)
     - [ ] `created` action
     - [ ] `updated` action
     - [ ] `deleted` action
