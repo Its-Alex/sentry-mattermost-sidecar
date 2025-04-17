@@ -1,6 +1,18 @@
+<!-- omit in toc -->
 # sentry-mattermost-sidecar
 
 This tools is a sidecar to use sentry webhook on mattermost.
+
+- [Roadmap](#roadmap)
+- [How to use](#how-to-use)
+- [Requirements](#requirements)
+- [Getting started](#getting-started)
+  - [Hack](#hack)
+- [Deploy new tags](#deploy-new-tags)
+- [Setup VM with Mattermost and Sentry](#setup-vm-with-mattermost-and-sentry)
+  - [Setup](#setup)
+  - [Configure webhooks](#configure-webhooks)
+- [Send errors to Sentry](#send-errors-to-sentry)
 
 ## Roadmap
 
@@ -50,9 +62,7 @@ services:
 Finally you must setup sentry custom integration and alert:  
 ![sentry-webhook-integration-setup](docs/assets/sentry-integration-and-alert-creation.gif)
 
-## Getting started
-
-### Requirement
+## Requirements
 
 - [`mise`](https://mise.jdx.dev/) (if you want to send real errors to sentry)
 - `docker`
@@ -72,7 +82,9 @@ $ pip install -r requirements.txt
 This will install python with a predefined version of sentry-sdk python package
 in an isolated [.venv](https://docs.python.org/3/library/venv.html) folder.
 
-## Hack
+## Getting started
+
+### Hack
 
 To start you must launch dev environment:
 
@@ -112,7 +124,7 @@ This is an environment aimed to reproduced real use case. If you really want to
 perform tests with Mattermost and Sentry, you can do it locally following
 [Setup VM with Mattermost and Sentry](#setup-vm-with-mattermost-and-sentry).
 
-## Deploy
+## Deploy new tags
 
 This image is automatically deployed and versionned as a docker image at [itsalex/sentry-mattermost-sidecar](https://hub.docker.com/r/itsalex/sentry-mattermost-sidecar).
 
