@@ -86,6 +86,60 @@ func main() {
 			if err != nil {
 				log.Fatalf("Error during json marshal: %v", err)
 			}
+		} else if c.Request.Header.Get("Sentry-Hook-Resource") == "event_alert" && gjson.Get(jsonStringData, "action").String() == "triggered" {
+			log.Println("Use event_alert custom integration")
+
+			title := gjson.Get(jsonStringData, "data.event_alert.title").String()
+
+			postBody, err = json.Marshal(map[string]interface{}{
+				"channel": channel,
+				"attachments": []interface{}{
+					map[string]interface{}{
+						"title":       title,
+						"fallback":    title,
+						"color":       "#FF0000",
+						"author_name": "Sentry - Alert event",
+						"author_icon": "https://assets.stickpng.com/images/58482eedcef1014c0b5e4a76.png",
+						"author_link": gjson.Get(jsonStringData, "data.event.web_url").String(),
+						"title_link":  gjson.Get(jsonStringData, "data.event.web_url").String(),
+						"fields": []interface{}{
+							map[string]interface{}{
+								"short": false,
+								"title": "Type",
+								"value": gjson.Get(jsonStringData, "action").String(),
+							},
+							map[string]interface{}{
+								"short": false,
+								"title": "Triggered rule",
+								"value": gjson.Get(jsonStringData, "data.triggered_rule").String(),
+							},
+							map[string]interface{}{
+								"short": false,
+								"title": "Type",
+								"value": gjson.Get(jsonStringData, "data.event.type").String(),
+							},
+							map[string]interface{}{
+								"short": false,
+								"title": "Culprit",
+								"value": gjson.Get(jsonStringData, "data.event.culprit").String(),
+							},
+							map[string]interface{}{
+								"short": false,
+								"title": "Project ID",
+								"value": gjson.Get(jsonStringData, "data.event.project").String(),
+							},
+							map[string]interface{}{
+								"short": false,
+								"title": "Environment",
+								"value": gjson.Get(jsonStringData, "data.event.environment").String(),
+							},
+						},
+					},
+				},
+			})
+			if err != nil {
+				log.Fatalf("Error during json marshal: %v", err)
+			}
 		} else if c.Request.Header.Get("Sentry-Hook-Resource") == "issue" {
 			log.Println("Use issue custom integration")
 

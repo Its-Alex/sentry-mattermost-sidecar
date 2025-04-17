@@ -8,7 +8,7 @@ This tools is a sidecar to use sentry webhook on mattermost.
 - [ ] Handle sentry Metric alerts with [webhook legacy integration](https://github.com/getsentry/sentry-webhooks)
 - Handle [Custom integration - Sentry webhook](https://docs.sentry.io/organization/integrations/integration-platform/webhooks/)
   - Issues alerts
-    - [ ] `triggered` action
+    - [x] `triggered` action
   - Issues
     - [x] `created` action
     - [x] `resolved` action
