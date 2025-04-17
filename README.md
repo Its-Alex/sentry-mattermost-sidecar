@@ -28,7 +28,22 @@ First you must create a [Mattermost incoming webhook](https://developers.matterm
 integration:  
 ![mattermost-incoming-webhook-integration-setup](docs/assets/mattermost-incoming-webhook-integration-setup.png)
 
-Next you must deploy the [docker image](https://hub.docker.com/r/itsalex/sentry-mattermost-sidecar) (don't forget to fill `SMS_MATTERMOST_WEBHOOK_URL` environment variable with the Mattermost webhook URL) somewhere and redirect sentry webhook on it with route name defined as Mattermost channel for each projects.
+Next you must deploy the [docker image](https://hub.docker.com/r/itsalex/sentry-mattermost-sidecar)
+(don't forget to fill `SMS_MATTERMOST_WEBHOOK_URL` environment variable with the
+Mattermost webhook URL) somewhere and redirect sentry webhook on it with route
+name defined as Mattermost channel for each projects, for example with
+docker-compose:
+
+```yaml
+services:
+  sentry-mattermost-sidecar:
+    image: itsalex/sentry-mattermost-sidecar:latest
+    restart: unless-stopped
+    environment:
+      - SMS_MATTERMOST_WEBHOOK_URL=https://mattermost.example.com/hooks/abckus71ojr9idqarirt4mr8wa
+    ports:
+      - 1323:1323
+```
 
 Finally you must setup sentry custom integration and alert:  
 ![sentry-webhook-integration-setup](docs/assets/sentry-integration-and-alert-creation.gif)
