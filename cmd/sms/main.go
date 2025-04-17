@@ -57,6 +57,7 @@ func main() {
 						"color":       "#FF0000",
 						"author_name": "Sentry - Errors",
 						"author_icon": "https://assets.stickpng.com/images/58482eedcef1014c0b5e4a76.png",
+						"author_link": gjson.Get(jsonStringData, "data.error.web_url").String(),
 						"title_link":  gjson.Get(jsonStringData, "data.error.web_url").String(),
 						"fields": []interface{}{
 							map[string]interface{}{
@@ -157,6 +158,7 @@ func main() {
 							"author_name": "Sentry - Issues",
 							"author_icon": "https://assets.stickpng.com/images/58482eedcef1014c0b5e4a76.png",
 							// Can't get the link because it's not available in the payload
+							// "author_link":
 							// "title_link":
 							"fields": []interface{}{
 								map[string]interface{}{
@@ -207,6 +209,7 @@ func main() {
 						"color":       "#FF0000",
 						"author_name": "Sentry",
 						"author_icon": "https://assets.stickpng.com/images/58482eedcef1014c0b5e4a76.png",
+						"author_link": gjson.Get(jsonStringData, "url").String(),
 						"title_link":  gjson.Get(jsonStringData, "url").String(),
 						"fields": []interface{}{
 							map[string]interface{}{
