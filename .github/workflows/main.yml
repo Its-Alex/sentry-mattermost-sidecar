@@ -3,7 +3,6 @@ name: CI
 on:
   push:
   workflow_dispatch:
-  pull_request:
 
 jobs:
   test-build-docker-image:
