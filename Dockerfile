@@ -1,4 +1,4 @@
-FROM golang:1.24.1-alpine3.21 as builder
+FROM golang:1.26.2-alpine3.22 AS builder
 
 WORKDIR /src
 
@@ -9,7 +9,7 @@ COPY cmd/ /src/cmd/
 RUN go mod download \
     && GOOS=linux go build -v -o bin/sms github.com/itsalex/sentry-mattermost-sidecar/cmd/sms
 
-FROM alpine:3.21
+FROM alpine:3.22
 
 COPY --from=builder /src/bin/sms /usr/bin/go-sms
 
