@@ -15,7 +15,7 @@ integration.
 
 Next you must deploy the [docker image](https://hub.docker.com/r/rpsl/sentry-mattermost-sidecar) (don't forget to
 fill `SMS_MATTERMOST_WEBHOOK_URL` environment variable with the Mattermost webhook URL) somewhere and redirect sentry
-webhook on it with route name defined as Mattermost channel for each projects.
+webhook on it with route name defined as Mattermost channel for each projects (`/sentry/<channel>`). Use `/sentry` without a channel to post into the webhook's own channel, e.g. for webhooks locked to a channel.
 ![sentry-webhook-integration-setup](docs/assets/sentry-webhook-integration-setup.png)
 
 Then you setup [sentry issue alerts](https://docs.sentry.io/product/alerts/) as you like.

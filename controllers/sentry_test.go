@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 	"reflect"
@@ -104,5 +105,35 @@ func Test_makeMMPayloadFields_SentryApp(t *testing.T) {
 
 	if message.Link != "https://sentry.example.team/organizations/example/issues/10/events/7ad3823827c244b499c17c914e2d5736/" {
 		t.Errorf("Link = %q", message.Link)
+	}
+}
+
+func Test_makeMMPayload_Channel(t *testing.T) {
+	js := getJSONPayloadFromFile("sentry_app_test_payload.json")
+
+	tests := []struct {
+		name    string
+		channel string
+		want    interface{}
+	}{
+		{"Webhook channel", "", nil},
+		{"Explicit channel", "backend", "backend"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			raw, err := makeMMPayload(tt.channel, js)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			var got map[string]interface{}
+			if err := json.Unmarshal(raw, &got); err != nil {
+				t.Fatal(err)
+			}
+
+			if got["channel"] != tt.want {
+				t.Errorf("channel = %v, want %v", got["channel"], tt.want)
+			}
+		})
 	}
 }

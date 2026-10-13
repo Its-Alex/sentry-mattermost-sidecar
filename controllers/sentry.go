@@ -139,7 +139,6 @@ func makeMMPayload(channel string, sentryJSONPayload string) ([]byte, error) {
 	fields := makeMMPayloadFields(sentryJSONPayload)
 
 	payload := map[string]interface{}{
-		"channel": channel,
 		"attachments": []interface{}{
 			map[string]interface{}{
 				"title":       message.Title,
@@ -150,6 +149,12 @@ func makeMMPayload(channel string, sentryJSONPayload string) ([]byte, error) {
 				"fields":      fields,
 			},
 		},
+	}
+
+	// Without a channel Mattermost posts into the webhook's own channel,
+	// which is the only option for webhooks locked to a channel.
+	if channel != "" {
+		payload["channel"] = channel
 	}
 
 	return json.Marshal(payload)

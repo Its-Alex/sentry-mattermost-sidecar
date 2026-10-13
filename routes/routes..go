@@ -11,5 +11,6 @@ func SetRoutes(r *gin.Engine) {
 
 	// todo add NoRoute handler
 	// need to use named handlers for potential new features
+	r.POST("/sentry", controllers.SentryWebHookHandler)
 	r.POST("/sentry/:channel", controllers.SentryWebHookHandler)
 }
