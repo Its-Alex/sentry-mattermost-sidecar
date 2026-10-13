@@ -114,7 +114,20 @@ func SentryWebHookHandler(c *gin.Context) {
 		_ = resp.Body.Close()
 	}()
 
-	// todo: i think we can bypass response from webhook
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		body, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
+		log.WithFields(log.Fields{
+			"channel":    channel,
+			"statusCode": resp.StatusCode,
+			"response":   string(body),
+		}).Error("mattermost rejected payload")
+		c.AbortWithStatusJSON(http.StatusBadGateway, gin.H{
+			"result": "",
+			"error":  "mattermost rejected payload",
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"result": "success",
 		"error":  nil,
