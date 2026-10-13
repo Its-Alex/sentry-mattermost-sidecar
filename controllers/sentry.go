@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"regexp"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rpsl/sentry-mattermost-sidecar/config"
@@ -13,11 +14,54 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var SentryFields = map[string]string{
-	"Culprit":     "culprit",
-	"Project":     "project_slug",
-	"Environment": "event.environment",
-	"Server":      "event.server_name",
+// Fields are rendered in Mattermost in this order; empty values are skipped.
+type sentryMessage struct {
+	Title  string
+	Link   string
+	Fields [][2]string
+}
+
+// The event API url looks like /api/0/projects/<org>/<project>/events/<id>/
+var projectSlugFromEventURL = regexp.MustCompile(`/projects/[^/]+/([^/]+)/events/`)
+
+// parseSentryPayload supports two webhook formats:
+// - Sentry App (Internal Integration) "event_alert" payload, event is in data.event;
+// - legacy WebHooks plugin payload (not available in current self-hosted Sentry), event is in event.
+func parseSentryPayload(payload string) sentryMessage {
+	if event := gjson.Get(payload, "data.event"); event.Exists() {
+		project := ""
+		if m := projectSlugFromEventURL.FindStringSubmatch(event.Get("url").String()); m != nil {
+			project = m[1]
+		}
+
+		server := event.Get("server_name").String()
+		if server == "" {
+			server = event.Get(`tags.#(0=="server_name").1`).String()
+		}
+
+		return sentryMessage{
+			Title: event.Get("title").String(),
+			Link:  event.Get("web_url").String(),
+			Fields: [][2]string{
+				{"Culprit", event.Get("culprit").String()},
+				{"Project", project},
+				{"Environment", event.Get("environment").String()},
+				{"Server", server},
+				{"Rule", gjson.Get(payload, "data.triggered_rule").String()},
+			},
+		}
+	}
+
+	return sentryMessage{
+		Title: gjson.Get(payload, "event.title").String(),
+		Link:  gjson.Get(payload, "url").String(),
+		Fields: [][2]string{
+			{"Culprit", gjson.Get(payload, "culprit").String()},
+			{"Project", gjson.Get(payload, "project_slug").String()},
+			{"Environment", gjson.Get(payload, "event.environment").String()},
+			{"Server", gjson.Get(payload, "event.server_name").String()},
+		},
+	}
 }
 
 func SentryWebHookHandler(c *gin.Context) {
@@ -32,6 +76,7 @@ func SentryWebHookHandler(c *gin.Context) {
 			"result": "",
 			"error":  "can't parse input payload",
 		})
+		return
 	}
 
 	// Create payload for Mattermost
@@ -43,6 +88,7 @@ func SentryWebHookHandler(c *gin.Context) {
 			"result": "",
 			"error":  "internal error",
 		})
+		return
 	}
 
 	// Send webhook request into Mattermost
@@ -55,17 +101,18 @@ func SentryWebHookHandler(c *gin.Context) {
 		bytes.NewBuffer(mmPayload),
 	)
 
-	defer func() {
-		_ = resp.Body.Close()
-	}()
-
 	if err != nil {
-		log.WithError(err)
+		log.WithError(err).Error("can't send payload to mattermost")
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"result": "",
 			"error":  "internal error",
 		})
+		return
 	}
+
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	// todo: i think we can bypass response from webhook
 	c.JSON(http.StatusOK, gin.H{
@@ -75,17 +122,18 @@ func SentryWebHookHandler(c *gin.Context) {
 }
 
 func makeMMPayload(channel string, sentryJSONPayload string) ([]byte, error) {
+	message := parseSentryPayload(sentryJSONPayload)
 	fields := makeMMPayloadFields(sentryJSONPayload)
 
 	payload := map[string]interface{}{
 		"channel": channel,
 		"attachments": []interface{}{
 			map[string]interface{}{
-				"title":       gjson.Get(sentryJSONPayload, "event.title").String(),
+				"title":       message.Title,
 				"color":       "#FF0000",
 				"author_name": "Sentry",
 				"author_icon": "https://assets.stickpng.com/images/58482eedcef1014c0b5e4a76.png",
-				"title_link":  gjson.Get(sentryJSONPayload, "url").String(),
+				"title_link":  message.Link,
 				"fields":      fields,
 			},
 		},
@@ -97,17 +145,15 @@ func makeMMPayload(channel string, sentryJSONPayload string) ([]byte, error) {
 func makeMMPayloadFields(sentryJSONPayload string) []interface{} {
 	var fields []interface{}
 
-	for k, v := range SentryFields {
-		sVal := gjson.Get(sentryJSONPayload, v).String()
-
-		if sVal == "" {
+	for _, f := range parseSentryPayload(sentryJSONPayload).Fields {
+		if f[1] == "" {
 			continue
 		}
 
 		fields = append(fields, map[string]interface{}{
 			"short": false,
-			"title": k,
-			"value": sVal,
+			"title": f[0],
+			"value": f[1],
 		})
 	}
 

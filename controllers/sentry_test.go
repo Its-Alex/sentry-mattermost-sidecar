@@ -8,7 +8,7 @@ import (
 )
 
 func Test_makeMMPayloadFields(t *testing.T) {
-	js := getJSONPayloadFromFile()
+	js := getJSONPayloadFromFile("sentry_test_payload.json")
 
 	type args struct {
 		sentryJSONPayload string
@@ -52,11 +52,57 @@ func Test_makeMMPayloadFields(t *testing.T) {
 	}
 }
 
-func getJSONPayloadFromFile() string {
-	content, err := os.ReadFile("sentry_test_payload.json")
+func getJSONPayloadFromFile(name string) string {
+	content, err := os.ReadFile(name)
 	if err != nil {
 		log.Fatal("Error when opening file: ", err)
 	}
 
 	return string(content)
+}
+
+func Test_makeMMPayloadFields_SentryApp(t *testing.T) {
+	js := getJSONPayloadFromFile("sentry_app_test_payload.json")
+
+	want := []interface{}{
+		map[string]interface{}{
+			"short": false,
+			"title": "Culprit",
+			"value": "App\\Http\\Controllers\\ParkingController@show",
+		},
+		map[string]interface{}{
+			"short": false,
+			"title": "Project",
+			"value": "backend",
+		},
+		map[string]interface{}{
+			"short": false,
+			"title": "Environment",
+			"value": "production",
+		},
+		map[string]interface{}{
+			"short": false,
+			"title": "Server",
+			"value": "parkly-prod-01",
+		},
+		map[string]interface{}{
+			"short": false,
+			"title": "Rule",
+			"value": "New issue -> mattermost",
+		},
+	}
+
+	if got := makeMMPayloadFields(js); !reflect.DeepEqual(got, want) {
+		t.Errorf("makeMMPayloadFields() = %v, want %v", got, want)
+	}
+
+	message := parseSentryPayload(js)
+
+	if message.Title != "ErrorException: Undefined array key \"id\"" {
+		t.Errorf("Title = %q", message.Title)
+	}
+
+	if message.Link != "https://sentry.example.team/organizations/example/issues/10/events/7ad3823827c244b499c17c914e2d5736/" {
+		t.Errorf("Link = %q", message.Link)
+	}
 }

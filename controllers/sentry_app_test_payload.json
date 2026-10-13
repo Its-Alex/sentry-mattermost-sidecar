@@ -1,0 +1,31 @@
+{
+  "action": "triggered",
+  "installation": {
+    "uuid": "a8e5d37a-696c-4c54-adb5-b3f28d64c7de"
+  },
+  "data": {
+    "event": {
+      "event_id": "7ad3823827c244b499c17c914e2d5736",
+      "project": 2,
+      "platform": "php",
+      "title": "ErrorException: Undefined array key \"id\"",
+      "culprit": "App\\Http\\Controllers\\ParkingController@show",
+      "environment": "production",
+      "tags": [
+        ["environment", "production"],
+        ["level", "error"],
+        ["server_name", "parkly-prod-01"]
+      ],
+      "url": "https://sentry.example.team/api/0/projects/example/backend/events/7ad3823827c244b499c17c914e2d5736/",
+      "web_url": "https://sentry.example.team/organizations/example/issues/10/events/7ad3823827c244b499c17c914e2d5736/",
+      "issue_url": "https://sentry.example.team/api/0/organizations/example/issues/10/",
+      "issue_id": "10"
+    },
+    "triggered_rule": "New issue -> mattermost"
+  },
+  "actor": {
+    "type": "application",
+    "id": "sentry",
+    "name": "Sentry"
+  }
+}
