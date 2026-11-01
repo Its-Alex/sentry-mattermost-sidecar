@@ -86,7 +86,7 @@ jobs:
 
       - name: Generate version variable
         id: branch_name
-        run: echo ::set-output name=TAG_VERSION::${GITHUB_REF#refs/tags/v}
+        run: echo "TAG_VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU for docker
         uses: docker/setup-qemu-action@v4
