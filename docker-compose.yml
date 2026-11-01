@@ -1,6 +1,6 @@
 services:
   workspace:
-    image: golang:1.26.2-alpine3.22
+    image: golang:1.27.3-alpine3.24
     restart: unless-stopped
     working_dir: /code/
     volumes:
